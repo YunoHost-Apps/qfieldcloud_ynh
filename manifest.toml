@@ -3,8 +3,8 @@ packaging_format = 2
 id = "qfieldcloud"
 name = "QFieldCloud"
 
-description.en = "QFieldCloud is a web server to synchronize projects and data between QGIS and QField. It allows seamless synchronization of your field data with change tracking, team management and online-offline work capabilities."
-description.fr = "QFieldCloud est un serveur web qui permet de synchroniser les projets et les données entre QGIS et QField. Il permet une synchronisation transparente de vos données de terrain avec le suivi des changements, la gestion des équipes et les capacités de travail en ligne et hors ligne."
+description.en = "Web server to synchronize projects and data between QGIS and QField. It allows seamless synchronization of your field data with change tracking, team management and online-offline work capabilities."
+description.fr = "Un serveur web qui permet de synchroniser les projets et les données entre QGIS et QField. Il permet une synchronisation transparente de vos données de terrain avec le suivi des changements, la gestion des équipes et les capacités de travail en ligne et hors ligne."
 
 version = "0.22.2~ynh1"
 
