@@ -16,7 +16,8 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 
 ## Overview
 
-QFieldCloud is a web server to synchronize projects and data between QGIS and QField. It allows seamless synchronization of your field data with change tracking, team management and online-offline work capabilities.
+
+
 
 **Shipped version:** 0.22.2~ynh1
 ## Documentation and resources
