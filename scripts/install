@@ -55,7 +55,7 @@ if ! yunohost app list | grep -q "id: minio"; then
 	fi
 	# FIXME hackish workaround to circumvent the linter
 	public=public
-	yunohost app install https://github.com/YunoHost-Apps/minio_ynh --force --args "domain=$minio_domain__&is_$public=true&admin=$minio_admin&password=$minio_password"
+	yunohost app install https://github.com/YunoHost-Apps/minio_ynh --force --args "domain=$minio_domain&is_$public=true&admin=$minio_admin&password=$minio_password"
 fi
 
 #=================================================
