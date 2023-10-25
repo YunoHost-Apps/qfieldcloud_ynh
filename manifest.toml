@@ -12,7 +12,7 @@ maintainers = ["Lapineige"]
 
 [upstream]
 # NB: Only the "license" key is mandatory. Remove entries for which there's no relevant data
-license = "GPL"
+license = "MIT"
 website = "https://qfield.cloud/"
 demo = ""
 admindoc = ""
