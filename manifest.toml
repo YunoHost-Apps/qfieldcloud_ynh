@@ -28,9 +28,9 @@ fund = "???"
 yunohost = ">= 11.1.21"
 # List of supported archs using the dpkg --print-architecture nomenclature (amd64/i386/armhf/arm64), for example: ["amd64", "i386']
 architectures = "all" # TODO : handle the "all" option (no ["all"])
-multi_instance = False
+multi_instance = false
 ldap = false
-sso = not_relevant
+sso = "not_relevant"
 # FIXME: replace with an **estimate** minimum disk and RAM requirements. e.g. 20M, 400M, 1G... You may have have a look at CI results
 disk = "50M"
 ram.build = "500M"
