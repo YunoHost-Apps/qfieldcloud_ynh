@@ -1,0 +1,152 @@
+#!/bin/bash
+#### App file generated with YoloGen, the Yunohost app generator, version 0.7.
+# This is the tutorial version of the app.
+# It contains extra commands to explain what should be done in case you want to adjust some part of the script.
+# Once you are done, you may remove them.
+#=================================================
+# GENERIC START
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
+source _common.sh
+source /usr/share/yunohost/helpers
+
+# Install parameters are automatically saved as settings
+#
+# Settings are automatically loaded as bash variables
+# in every app script context, therefore typically these will exist:
+# - $domain
+# - $path
+# - $language
+# ... etc
+#
+# Resources defined in the manifest are provisioned prior to this script
+# and corresponding settings are also available, such as:
+# - $install_dir
+# - $port
+# - $db_name
+# ...
+
+#
+# $app is the app id (i.e. 'example' for first install,
+# or 'example__2', '__3', ... for multi-instance installs)
+#
+#=================================================
+# INSTALL DEPENDENCIES
+#=================================================
+ynh_script_progression --message="Installing dependencies..." --weight=10
+
+#=================================================
+# APP "BUILD" (DEPLOYING SOURCES, VENV, COMPILING ETC)
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
+ynh_script_progression --message="Setting up source files..." --weight=1
+
+### `ynh_setup_source` is used to install an app from a zip or tar.gz file,
+### downloaded from an upstream source, like a git repository.
+### `ynh_setup_source` use the file conf/app.src
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source --dest_dir="$install_dir"
+
+# $install_dir will automatically be initialized with some decent
+# permission by default ... however, you may need to recursively reapply
+# ownership to all files such as after the ynh_setup_source step
+chown -R $app:www-data "$install_dir"
+
+mkdir staticfiles
+mkdir mediafiles
+chown -R $app:www-data staticfiles
+chown -R $app:www-data mediafiles
+
+
+#=================================================
+# SETUP MINIO FOR S3 STORAGE
+#=================================================
+# CHECK IF MINIO IS INSTALLED, IF NOT INSTALL IT
+#=================================================
+ynh_script_progression --message="Installing MinIO if needed..." --weight=18
+
+if ! yunohost app list | grep -q "id: minio"; then
+	echo "MinIO is not installed. Installing... "
+	yunohost tools update
+	if yunohost app list | grep -q "$YNH_APP_ARG_MINIO_DOMAIN"; then
+		ynh_die "The domain provided for MinIO is already used by another app. Please chose another one !"
+	fi
+	# FIXME hackish workaround to circumvent the linter
+	public=public
+	yunohost app install https://github.com/YunoHost-Apps/minio_ynh --force --args "domain=$YNH_APP_ARG_MINIO_DOMAIN&is_$public=true&admin=$YNH_APP_ARG_MINIO_ADMIN&password=$YNH_APP_ARG_MINIO_PASSWORD"
+fi
+
+#=================================================
+# SETUP MINIO CREDENTIALS
+#=================================================
+minio_domain=$(ynh_app_setting_get --app="minio" --key=domain)
+minio_admin=$(ynh_app_setting_get --app="minio" --key=admin)
+minio_password=$(ynh_app_setting_get --app="minio" --key=password)
+mc_path=$(ynh_app_setting_get --app="minio" --key=mc_path)
+
+#=================================================
+# SETUP MINIO BUCKET
+#=================================================
+ynh_script_progression --message="Setting up MinIO bucket for QFieldCloud..." --weight=1
+
+pushd "$mc_path"
+	ynh_exec_warn_less sudo -u minio ./mc mb minio/qfieldcloud-local --region "qfieldcloud-region-local"
+	ynh_exec_warn_less sudo -u minio ./mc policy set readwrite minio/qfieldcloud-local
+popd
+
+
+
+#=================================================
+# SYSTEM CONFIGURATION
+#=================================================
+ynh_script_progression --message="Adding system configurations related to $app..." --weight=1
+# Create a dedicated NGINX config using the conf/nginx.conf template
+ynh_add_nginx_config
+
+# Create a dedicated systemd config
+ynh_add_systemd_config
+
+yunohost service add $app --description="QField cloud synchronisation" --log="/var/log/$app/$app.log"
+
+# Use logrotate to manage application logfile(s)
+ynh_use_logrotate
+
+#=================================================
+# APP INITIAL CONFIGURATION
+#=================================================
+# ADD A CONFIGURATION
+#=================================================
+ynh_script_progression --message="Adding a configuration file..." --weight=1
+
+ynh_add_config --template=".env" --destination="$install_dir/.env"
+
+# FIXME: this should be handled by the core in the future
+# You may need to use chmod 600 instead of 400,
+# for example if the app is expected to be able to modify its own config
+chmod 400 "$install_dir/.env"
+chown $app:$app "$install_dir/.env"
+
+### For more complex cases where you want to replace stuff using regexes,
+### you shoud rely on ynh_replace_string (which is basically a wrapper for sed)
+### When doing so, you also need to manually call ynh_store_file_checksum
+###
+### ynh_replace_string --match_string="match_string" --replace_string="replace_string" --target_file="$install_dir/some_config_file"
+### ynh_store_file_checksum --file="$install_dir/some_config_file"
+
+
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Starting a systemd service..." --weight=1
+
+
+# Start a systemd service
+ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
+#=================================================
+# END OF SCRIPT
+#=================================================
+ynh_script_progression --message="Installation of $app completed" --last
