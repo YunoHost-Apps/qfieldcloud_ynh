@@ -8,7 +8,7 @@ test_format = 1.0
 
     preinstall = """
     sudo yunohost domain add minio.domain.tld
-    sudo yunohost user create minio_admin -F Minio_Admin -p minio_user_pwd
+    sudo yunohost user create minioadmin -F Minio -p minio_user_pwd
     """
 
-    args.minio_admin="minio_admin"
+    args.minio_admin="minioadmin"
