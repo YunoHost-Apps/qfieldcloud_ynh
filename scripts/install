@@ -34,10 +34,10 @@ ynh_setup_source --dest_dir="$install_dir"
 # ownership to all files such as after the ynh_setup_source step
 chown -R $app:www-data "$install_dir"
 
-mkdir staticfiles
-mkdir mediafiles
-chown -R $app:www-data staticfiles
-chown -R $app:www-data mediafiles
+mkdir $install_dir/staticfiles
+mkdir $install_dir/mediafiles
+chown -R $app:www-data $install_dir/staticfiles
+chown -R $app:www-data $install_dir/mediafiles
 
 
 #=================================================
@@ -72,10 +72,10 @@ mc_path=$(ynh_app_setting_get --app="minio" --key=mc_path)
 ynh_script_progression --message="Setting up MinIO bucket for QFieldCloud..." --weight=1
 
 pushd "$mc_path"
-	ynh_exec_warn pwd
+	ynh_exec_warn echo "$mc_path"
 	ynh_exec_warn ls -l
-	ynh_exec_warn_less sudo -u minio ./mc mb minio/qfieldcloud-local --region "qfieldcloud-region-local"
-	ynh_exec_warn_less sudo -u minio ./mc policy set readwrite minio/qfieldcloud-local
+	ynh_exec_warn_less sudo -u minio /var/www/mc mb minio/qfieldcloud-local --region "qfieldcloud-region-local"
+	ynh_exec_warn_less sudo -u minio /var/www/mc policy set readwrite minio/qfieldcloud-local
 popd
 
 
