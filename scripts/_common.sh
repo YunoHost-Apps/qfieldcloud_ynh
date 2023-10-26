@@ -60,7 +60,6 @@ pip_dependencies=(
 	'itypes==1.2.0'
 	'Jinja2==3.1.2'
 	'jmespath==0.10.0'
-	'JSON-log-formatter==0.5.2'
 	'jsonfield==3.1.0'
 	'jsonschema==3.2.0'
 	'MarkupSafe==2.1.2'
