@@ -1,5 +1,5 @@
-command = '__INSTALLDIR__/venv/bin/gunicorn'
-pythonpath = '__INSTALLDIR__'
+command = '__INSTALL_DIR__/venv/bin/gunicorn'
+pythonpath = '__INSTALL_DIR__'
 threads = 3
 workers = 1
 user = '__APP__'
