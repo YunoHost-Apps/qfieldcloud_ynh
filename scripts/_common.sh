@@ -60,7 +60,6 @@ pip_dependencies=(
 	'itypes==1.2.0'
 	'Jinja2==3.1.2'
 	'jmespath==0.10.0'
-	'JSON-log-formatter==0.5.2'
 	'jsonfield==3.1.0'
 	'jsonschema==3.2.0'
 	'MarkupSafe==2.1.2'
@@ -92,15 +91,14 @@ pip_dependencies=(
 	'typing-extensions==4.6.0'
 	'tzdata==2023.3'
 	'uritemplate==4.1.1'
-	'urllib3==1.26.15'
+	'urllib3'
 	'websocket-client==1.5.2'
 	'wrapt==1.15.0'
 	'jsonschema>=3.2.0,<3.3'
-	'typing-extensions>=3.7.4.3,<3.7.5'
 	'tabulate==v0.8.9'
 	'sentry-sdk'
 	'requests>=2.28.1'
-	'qfieldcloud-sdk==0.8.2'
+	'qfieldcloud-sdk'
 )
 
 

@@ -11,30 +11,15 @@
 source _common.sh
 source /usr/share/yunohost/helpers
 
-# Install parameters are automatically saved as settings
-#
-# Settings are automatically loaded as bash variables
-# in every app script context, therefore typically these will exist:
-# - $domain
-# - $path
-# - $language
-# ... etc
-#
-# Resources defined in the manifest are provisioned prior to this script
-# and corresponding settings are also available, such as:
-# - $install_dir
-# - $port
-# - $db_name
-# ...
+#=================================================
+# SPECIFIC SETUP
+#=================================================
+# BUILD VENV
+#=================================================
+ynh_script_progression --message="Building venv..." --weight=6
 
-#
-# $app is the app id (i.e. 'example' for first install,
-# or 'example__2', '__3', ... for multi-instance installs)
-#
-#=================================================
-# INSTALL DEPENDENCIES
-#=================================================
-ynh_script_progression --message="Installing dependencies..." --weight=10
+__ynh_python_venv_setup --venv_dir="$install_dir/venv" --packages "${pip_dependencies[*]}"
+python_venv_site_packages=$(__ynh_python_venv_get_site_packages_dir -d "$install_dir/venv")
 
 #=================================================
 # APP "BUILD" (DEPLOYING SOURCES, VENV, COMPILING ETC)
@@ -54,10 +39,10 @@ ynh_setup_source --dest_dir="$install_dir"
 # ownership to all files such as after the ynh_setup_source step
 chown -R $app:www-data "$install_dir"
 
-mkdir staticfiles
-mkdir mediafiles
-chown -R $app:www-data staticfiles
-chown -R $app:www-data mediafiles
+mkdir $install_dir/staticfiles
+mkdir $install_dir/mediafiles
+chown -R $app:www-data $install_dir/staticfiles
+chown -R $app:www-data $install_dir/mediafiles
 
 
 #=================================================
@@ -70,12 +55,12 @@ ynh_script_progression --message="Installing MinIO if needed..." --weight=18
 if ! yunohost app list | grep -q "id: minio"; then
 	echo "MinIO is not installed. Installing... "
 	yunohost tools update
-	if yunohost app list | grep -q "$YNH_APP_ARG_MINIO_DOMAIN"; then
+	if yunohost app list | grep -q "$minio_domain"; then
 		ynh_die "The domain provided for MinIO is already used by another app. Please chose another one !"
 	fi
 	# FIXME hackish workaround to circumvent the linter
 	public=public
-	yunohost app install https://github.com/YunoHost-Apps/minio_ynh --force --args "domain=$YNH_APP_ARG_MINIO_DOMAIN&is_$public=true&admin=$YNH_APP_ARG_MINIO_ADMIN&password=$YNH_APP_ARG_MINIO_PASSWORD"
+	yunohost app install https://github.com/YunoHost-Apps/minio_ynh --force --args "domain=$minio_domain&is_$public=true&admin=$minio_admin&password=$minio_password"
 fi
 
 #=================================================
@@ -92,11 +77,11 @@ mc_path=$(ynh_app_setting_get --app="minio" --key=mc_path)
 ynh_script_progression --message="Setting up MinIO bucket for QFieldCloud..." --weight=1
 
 pushd "$mc_path"
-	ynh_exec_warn_less sudo -u minio ./mc mb minio/qfieldcloud-local --region "qfieldcloud-region-local"
-	ynh_exec_warn_less sudo -u minio ./mc policy set readwrite minio/qfieldcloud-local
+	ynh_exec_warn echo "$mc_path"
+	ynh_exec_warn ls -l $mc_path
+	ynh_exec_warn_less sudo -u minio /var/www/minio/mc mb minio/qfieldcloud-local --region "qfieldcloud-region-local"
+	ynh_exec_warn_less sudo -u minio /var/www/minio/mc policy set readwrite minio/qfieldcloud-local
 popd
-
-
 
 #=================================================
 # SYSTEM CONFIGURATION
@@ -121,6 +106,7 @@ ynh_use_logrotate
 ynh_script_progression --message="Adding a configuration file..." --weight=1
 
 ynh_add_config --template=".env" --destination="$install_dir/.env"
+ynh_add_config --template="gunicorn.py" --destination="$install_dir/gunicorn.py"
 
 # FIXME: this should be handled by the core in the future
 # You may need to use chmod 600 instead of 400,
