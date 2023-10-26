@@ -72,6 +72,8 @@ mc_path=$(ynh_app_setting_get --app="minio" --key=mc_path)
 ynh_script_progression --message="Setting up MinIO bucket for QFieldCloud..." --weight=1
 
 pushd "$mc_path"
+	ynh_exec_warn pwd
+	ynh_exec_warn ls -l
 	ynh_exec_warn_less sudo -u minio ./mc mb minio/qfieldcloud-local --region "qfieldcloud-region-local"
 	ynh_exec_warn_less sudo -u minio ./mc policy set readwrite minio/qfieldcloud-local
 popd
