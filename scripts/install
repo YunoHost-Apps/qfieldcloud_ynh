@@ -106,6 +106,7 @@ ynh_use_logrotate
 ynh_script_progression --message="Adding a configuration file..." --weight=1
 
 ynh_add_config --template=".env" --destination="$install_dir/.env"
+ynh_add_config --template="gunicorn.py" --destination="$install_dir/gunicorn.py"
 
 # FIXME: this should be handled by the core in the future
 # You may need to use chmod 600 instead of 400,
