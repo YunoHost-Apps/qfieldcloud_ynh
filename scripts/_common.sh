@@ -96,7 +96,6 @@ pip_dependencies=(
 	'websocket-client==1.5.2'
 	'wrapt==1.15.0'
 	'jsonschema>=3.2.0,<3.3'
-	'typing-extensions>=3.7.4.3,<3.7.5'
 	'tabulate==v0.8.9'
 	'sentry-sdk'
 	'requests>=2.28.1'
