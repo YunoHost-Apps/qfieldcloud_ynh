@@ -12,9 +12,14 @@ source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
-# INSTALL DEPENDENCIES
+# SPECIFIC SETUP
 #=================================================
-ynh_script_progression --message="Installing dependencies..." --weight=10
+# BUILD VENV
+#=================================================
+ynh_script_progression --message="Building venv..." --weight=6
+
+__ynh_python_venv_setup --venv_dir="$install_dir/venv" --packages "${pip_dependencies[*]}"
+python_venv_site_packages=$(__ynh_python_venv_get_site_packages_dir -d "$install_dir/venv")
 
 #=================================================
 # APP "BUILD" (DEPLOYING SOURCES, VENV, COMPILING ETC)
