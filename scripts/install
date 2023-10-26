@@ -73,12 +73,10 @@ ynh_script_progression --message="Setting up MinIO bucket for QFieldCloud..." --
 
 pushd "$mc_path"
 	ynh_exec_warn echo "$mc_path"
-	ynh_exec_warn ls -l
+	ynh_exec_warn ls -l $mc_path
 	ynh_exec_warn_less sudo -u minio /var/www/minio/mc mb minio/qfieldcloud-local --region "qfieldcloud-region-local"
 	ynh_exec_warn_less sudo -u minio /var/www/minio/mc policy set readwrite minio/qfieldcloud-local
 popd
-
-
 
 #=================================================
 # SYSTEM CONFIGURATION
